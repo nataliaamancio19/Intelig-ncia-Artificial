@@ -17,7 +17,11 @@ public class Puzzle {
         
         do
         {
-        	estadoAtual = filaDeEstados.remove(0);
+        	if(!filaDeEstados.isEmpty()){
+        		estadoAtual = filaDeEstados.remove(0);
+        	}
+        	else 
+        		break;
         	
         	if( !comparaEstados(estadoAtual.getNoAtual(), objetivo) && !contais(estadoAtual, estadosJaVisitados))
         	{
@@ -25,7 +29,8 @@ public class Puzzle {
         		estadosJaVisitados.add(estadoAtual);
         	}
         	
-        }while(!comparaEstados(estadoAtual.getNoAtual(), objetivo) || filaDeEstados.isEmpty());
+        	
+        }while(!comparaEstados(estadoAtual.getNoAtual(), objetivo) && !filaDeEstados.isEmpty());
         
        if(filaDeEstados.isEmpty())
         {
@@ -137,9 +142,10 @@ public class Puzzle {
 	{
 		
 		// INVÁLIDO
-		String[][] puzzle = { { "1", "2", "3" }, { "5", "4", " " }, { "7", "8", "6" } };
+		String[][] puzzle = { { "1", "2", "3" }, { "4", "5", "6" }, { "8", "7", " " } };
 		
-		//String[][] puzzle = { { "1", " ", "2" }, { "4", "5", "3" }, { "7", "8", "6" } };
+		//String[][] puzzle = { { "1", "2", "3" }, { "4", "5", "6" }, { "7", "8", " " } };
+		//String[][] puzzle = { { "1", "2", "3" }, { "5", "4", " " }, { "7", "8", "6" } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "4", "5", " " }, { "7", "8", "6" } };
 		//String[][] puzzle = { { "1", "2", " " }, { "4", "5", "3" }, { "7", "8", "6" } };
 		//String[][] puzzle = { { "1", "5", "2" }, { "4", " ", "3" }, { "7", "8", "6" } };
@@ -168,7 +174,7 @@ public class Puzzle {
 
 	public static String[][] preencherObjetivo()
 	    {
-	        String[][] puzzle = {{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", " "}};
+	        String[][] puzzle = {{" ", "1", "2"}, { "3", "4", "5",}, {"6", "7", "8"}};
 	    return puzzle;
 	    }
 
@@ -183,11 +189,10 @@ public class Puzzle {
 	             if(elemento.getNoAtual()[i][j] == estadoAtual.getNoAtual()[i][j])
 	                 ++contem;
 	            }
-	            if(i == 2 && contem == 9)
-	            	return true;
-	            else 
-	            	contem = 0;
 	        }
+	        if(contem == 9)
+	        	return true;
+	        contem = 0;
 	    }
 	      return false;
 	  } 
