@@ -38,15 +38,20 @@ public class OitoRainhas {
 				estadosvisitados.add(estadoAtual);
 				todosEstados = ordenaEstados(todosEstados);
 			}
-			System.out.println("Estou tentando");
+
 		}while(getQtdChoques(estadoAtual.getEstadoAtual()) != 0);
-		System.out.println("encontrei a solução");
 		
-		for(int a = 0; a <= 8; a++ )
+		imprimeSolucao(estadoAtual);
+	}
+	
+	
+	public static void imprimeSolucao(Estado estadoAtual)
+	{
+		if(estadoAtual.estadoAnterior != null)
 		{
-			System.out.println( "Linha :" + a + " Coluna: " + estadoAtual.getEstadoAtual()[a]);
+			imprimeSolucao(estadoAtual.estadoAnterior);
 		}
-		
+		imprimirTabuleiro(estadoAtual.estadoAtual);
 	}
 	
 	public static List<Estado> permutaPosicoes(int posicao, Estado estado)
@@ -85,34 +90,20 @@ public class OitoRainhas {
 		 return estados;
 	}
 	
-	public static void imprimirTabuleiro(int[] estadoAtual)
+	public static void imprimirTabuleiro(Integer[] estadoAtual)
 	{
 		for(int i = 1; i <= 8; i++) // linhas
 		{
 			for(int a = 1; a <= 8; a++) // colunas
 			{
-			if(Arrays.asList(estadoAtual).indexOf(estadoAtual[a]) == i && estadoAtual[a] == a)
-					System.out.print(" R |");
+			if(estadoAtual[i] == a)
+					System.out.print(" R  ");
 			else 
-					System.out.print("    ");
+					System.out.print(" *  ");
 			}
 			System.out.println("\n-------------------------------");
 		}
-	}
-
-	public static String[][] estadoInicial()
-	{
-		String[][] tabuleiro = new String[8][8];
-		tabuleiro[0][0] = " R ";
-		tabuleiro[1][1] = " R ";
-		tabuleiro[2][2] = " R ";
-		tabuleiro[3][3] = " R ";
-		tabuleiro[4][4] = " R ";
-		tabuleiro[5][5] = " R ";
-		tabuleiro[6][6] = " R ";
-		tabuleiro[7][7] = " R ";
-		
-		return tabuleiro;
+		System.out.println("\n\n");
 	}
 
 	public static int getQtdChoques(Integer[] estado)
@@ -127,7 +118,7 @@ public class OitoRainhas {
 					linha =  aux.indexOf(estado[b])- aux.indexOf(estado[a]);
 					coluna = estado[b] - estado[a];
 					
-					if(linha == coluna || linha - coluna == 0 || linha + coluna == 0)
+					if(Math.abs(linha) == Math.abs(coluna))
 						++choques;
 				}
 			}
@@ -146,7 +137,29 @@ public class OitoRainhas {
 		inicial[5] = 5;
 		inicial[6] = 6;
 		inicial[7] = 7;
-		inicial[8] = 8;
+		inicial[8] = 8; 
+		
+		/* FUNCIONOU
+		inicial[0] = 0;
+		inicial[1] = 1;
+		inicial[2] = 3;
+		inicial[3] = 5;
+		inicial[4] = 2;
+		inicial[5] = 4;
+		inicial[6] = 7;
+		inicial[7] = 8;
+		inicial[8] = 6; */
+		
+		/*inicial[0] = 0;
+		inicial[1] = 1;
+		inicial[2] = 5;
+		inicial[3] = 3;
+		inicial[4] = 4;
+		inicial[5] = 2;
+		inicial[6] = 6;
+		inicial[7] = 7;
+		inicial[8] = 8; */
+		
 		Estado estadoInicial = new Estado();
 		estadoInicial.setEstadoAtual(inicial);
 		estadoInicial.setQtdChoques(getQtdChoques(inicial));

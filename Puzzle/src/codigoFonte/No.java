@@ -1,5 +1,7 @@
 package codigoFonte;
 
+import java.util.Arrays;
+
 public class No 
 {
 	public No noPai;
@@ -22,4 +24,18 @@ public class No
 	public void setNoAtual(String[][] noAtual) {
 		this.noAtual = noAtual;
 	}	
+	
+	@Override
+	public int hashCode()
+	{
+		// TODO Auto-generated method stub
+		return Arrays.deepHashCode(noAtual);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		No no = (No) obj;
+		return Puzzle.comparaEstados(no.noAtual, noAtual);
+	}
 }

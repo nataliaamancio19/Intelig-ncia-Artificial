@@ -1,13 +1,14 @@
 package codigoFonte;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Puzzle {
 
 	public static void main(String[] args) {
 		
-		List<No> estadosJaVisitados = new ArrayList<No>();
+		HashSet<No> estadosJaVisitados = new HashSet<No>();
         No puzzle = preencherPuzzle();
         No estadoAtual = new No();
         String[][] objetivo = preencherObjetivo();
@@ -23,7 +24,7 @@ public class Puzzle {
         	else 
         		break;
         	
-        	if( !comparaEstados(estadoAtual.getNoAtual(), objetivo) && !contais(estadoAtual, estadosJaVisitados))
+        	if( !comparaEstados(estadoAtual.getNoAtual(), objetivo) && ! estadosJaVisitados.contains(estadoAtual))
         	{
         		expande(filaDeEstados, estadoAtual);
         		estadosJaVisitados.add(estadoAtual);
@@ -140,10 +141,8 @@ public class Puzzle {
 	
 	public static No preencherPuzzle()
 	{
-		
-		// INVÁLIDO
-		String[][] puzzle = { { "1", "2", "3" }, { "4", "5", "6" }, { "8", "7", " " } };
-		
+		String[][] puzzle = { { "7", "2", "4" }, { "5", " ", "6" }, { "8", "3", "1" } };
+		//String[][] puzzle = { { "1", "2", "3" }, { "4", "5", "6" }, { "8", "7", " " } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "4", "5", "6" }, { "7", "8", " " } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "5", "4", " " }, { "7", "8", "6" } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "4", "5", " " }, { "7", "8", "6" } };
