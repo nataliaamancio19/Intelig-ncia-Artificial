@@ -1,18 +1,22 @@
+package codigoFonte;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+
 public class MetroDeParis {
 	
-	static int[][] custos = getCustos();
+	static int[][] custoReal = getCustosReal();
+	static int[][] custosEmLinhaReta = getCustosEmLinhaReta();
 	static ArrayList<Integer> estacaoAzul = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
 	static ArrayList<Integer> estacaoVermelha = new ArrayList<>(Arrays.asList(11, 9, 3, 13));
 	static ArrayList<Integer> estacaoAmarela = new ArrayList<>(Arrays.asList(10, 2, 9, 8, 5, 7));
 	static ArrayList<Integer> estacaoVerde = new ArrayList<>(Arrays.asList(12, 8, 4, 13, 14));
 	static int custo = 0;
-	static int origem = 1;
-	static int destino = 2;
+	static int origem = 2;
+	static int destino = 1;
+	static int tempo = 0;
 	
 	public static void main(String[] args)
 	{
@@ -36,25 +40,32 @@ public class MetroDeParis {
 			
 		}while(estadoAtual.getEstadoAtual() != destino);
 		
-		custo = getCustoTotal(estadoAtual);
-		System.out.println("Custo Total: " + custo);
+		custo = estadoAtual.getCustoAtual();
+		System.out.println("Custo Total (Km): " + custo);
+		tempo = getTempoTotal(estadoAtual);
+		System.out.println("Tempo Total (Km): " + tempo);
+		imprimeNos(estadoAtual);
 		
 	}
 	
-	public static int getCustoTotal(No estadoAtual)
+	public static void imprimeNos(No estacaoAtual)
 	{
-		for(int i = 0; i < 17; i++)
+		if(estacaoAtual.noPai!= null)
+			imprimeNos(estacaoAtual.noPai);
+		System.out.println("Passei pelo nó = "  + estacaoAtual.estadoAtual + " custo = " + estacaoAtual.distanciaPercorrida );
+	}
+	
+	public static int getTempoTotal(No estadoAtual)
+	{
+		tempo += estadoAtual.getCustoAtual() * 2;
+		while(estadoAtual.noPai != null)
 		{
-			for(int a = 0; a < 2; a++)
-			{
-				
-				if(verificaSeEntaoNaMesmaLinha(i, a))
-					custo += 5;
-			}
+			//if(!verificaSeEntaoNaMesmaLinha(estadoAtual.estadoAtual, estadoAtual.noPai.estadoAtual))
+			//	tempo += 5;
+			
+			estadoAtual = estadoAtual.noPai;
 		}
-		
-		custo += estadoAtual.getCustoAtual();
-		return custo;
+		return tempo;
 	}
 	
 	public static boolean verificaSeEntaoNaMesmaLinha(int estacaoAtual, int estadoFilho)
@@ -62,7 +73,13 @@ public class MetroDeParis {
 		ArrayList<Linhas> linhasEstacaoAtual = getLinha(estacaoAtual);
 		ArrayList<Linhas> linhasEstacaoFilho = getLinha(estadoFilho);
 	
-		for(int i = 0; i < linhasEstacaoAtual.size(); i++)
+		if(linhasEstacaoAtual.size() == 2)
+			return false;
+		else if(linhasEstacaoFilho.size() == 2)
+			return false;
+		
+		return true;
+	/*	for(int i = 0; i < linhasEstacaoAtual.size(); i++)
 		{
 			for(int a = 0; a < linhasEstacaoFilho.size(); a++)
 			{
@@ -70,7 +87,7 @@ public class MetroDeParis {
 					return true;
 			}
 		}
-		return false;
+		return false; */
 	}
 	
 	public static ArrayList<No> expande( No estadoAtual)
@@ -78,21 +95,19 @@ public class MetroDeParis {
 		ArrayList<No> novosNos = new ArrayList<No>();
 		for(int i = 0; i < 17; i++)
 		{
-			for(int a = 0; a < 2; a++)
-			{
-				if(custos[i][a] == estadoAtual.getEstadoAtual())
+				if(custoReal[i][0] == estadoAtual.getEstadoAtual())
 				{
 					No novo = new No();
-					novo.setEstadoAtual(custos[i][a]);
-					novo.setCustoAtual(custos[i][2]);
-					novo.setFaltaAteObjetivo(getCustoAteObjetivo(custos[i][a]));
-					novo.setNoPai(estadoAtual);
+					
+					novo.setEstadoAtual(custoReal[i][1]);
+					novo.setFaltaAteObjetivo(custosEmLinhaReta[custoReal[i][1]][destino]);
+				    novo.setNoPai(estadoAtual);
 					novo.setDistanciaPercorrida(getDistanciaPercorrida(novo));
+					novo.gerarCustoAtual();
 				
 					novosNos.add(novo);
 				}
 			}
-		}
 		return novosNos;
 	}
 	
@@ -113,12 +128,13 @@ public class MetroDeParis {
 	
 	public static int getDistanciaPercorrida(No estacaoAtual)
 	{
-		if(estacaoAtual.getNoPai() != null)
+		int somatorio = 0;
+		while(estacaoAtual.noPai != null)
 		{
-			return estacaoAtual.getDistanciaPercorrida() + getDistanciaPercorrida(estacaoAtual.noPai);
+			somatorio += custosEmLinhaReta[estacaoAtual.estadoAtual][estacaoAtual.noPai.estadoAtual];
+			estacaoAtual = estacaoAtual.noPai;
 		}
-		else 
-			return estacaoAtual.getDistanciaPercorrida();
+		return somatorio;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -135,36 +151,49 @@ public class MetroDeParis {
 		 
 		 return estados;
 	}
-	
-	public static int getCustoAteObjetivo(int estacaoAtual)
-	{
-		for(int i = 0; i < 17; i++)
-		{
-			for(int a = 0; a < 2; a++)
-			{
-				if((estacaoAtual == i && destino == a) || (estacaoAtual == a && destino == i))
-				{
-					return custos[i][2];
-				}
-			}
-		}
-		return 0;
-	}
-	
+
 	public static No getEstadoInicial()
 	{
 		No novo = new No();
 		novo.setDistanciaPercorrida(0);
-		novo.setCustoAtual(getCustoAteObjetivo(origem));
-		novo.setFaltaAteObjetivo(getCustoAteObjetivo(origem));
+		novo.setFaltaAteObjetivo(custosEmLinhaReta[origem][destino]); // adiciona meu custo no valor 
+		novo.gerarCustoAtual();
 		novo.setEstadoAtual(origem);
 		
 		return novo;
 	}
 	
-	public static int[][] getCustos()
+	// Heurística: Quanto falta para chegar no meu objetivo.
+	// Custo: distância percorrida.
+	// Custo Total : custo + heurística
+	
+	public static int[][] getCustosEmLinhaReta()
 	{
-		int[][] custos = new int[][]
+		int[][] custos_emLinhaReta = new int[][]
+				{
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 11, 20, 27, 40, 43, 39, 28, 18, 10, 18, 30, 30, 32},
+			{0, 11, 0, 9, 16, 29, 32, 28, 19, 11, 4, 17, 23, 21, 24},
+			{0, 20, 9, 0, 7, 20, 22, 19, 15, 10, 11, 21, 21, 13, 18},
+			{0, 27, 16, 7, 0, 13, 16, 12, 13, 13, 18, 26, 21, 11, 17},
+			{0, 40, 29, 20, 13, 0, 3, 2, 21, 25, 31, 38, 27, 16, 20},
+			{0, 43, 22, 22, 16, 3, 0, 4, 23, 28, 33, 41, 30, 17, 20},
+			{0, 39, 28, 19, 12, 2, 4, 0, 22, 25, 29, 38, 28, 13, 17},
+			{0, 28, 19, 15, 13, 21, 23, 22, 0, 9, 22, 18, 7, 25, 30},
+			{0, 18, 11, 10, 13, 25, 28, 25, 9, 0, 13, 12, 12, 23, 28},
+			{0, 10, 4, 11, 18, 31, 33, 29, 22, 13, 0, 20, 27, 20, 23},
+			{0, 18, 17, 21, 26, 38, 41, 38, 18, 12, 20, 0, 15, 35, 39},
+			{0, 30, 23, 21, 21, 27, 30, 28, 7, 12, 27, 15, 0, 31, 37},
+			{0, 30, 21, 13, 11, 16, 17, 13, 25, 23, 20, 35, 31, 0, 5},
+			{0, 32, 24, 18, 17, 20, 20, 17, 30, 28, 23, 39, 37, 5, 0}
+				};
+				
+		return custos_emLinhaReta;
+	}
+	
+	public static int[][] getCustosReal()
+	{
+		int[][] custos_real = new int[][]
 				{
 						{1, 2, 11},
 						{2, 3, 9},
@@ -184,7 +213,6 @@ public class MetroDeParis {
 						{9, 11, 14},
 						{13, 14, 5}
 				};
-		
-		return custos;
+		return custos_real;
 	}
 }
