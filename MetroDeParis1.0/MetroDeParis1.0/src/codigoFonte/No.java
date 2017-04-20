@@ -4,8 +4,8 @@ public class No {
 
 	No noPai;
 	int estadoAtual;
-	int distanciaPercorrida;
-	int faltaAteObjetivo;
+	int distanciaPercorrida; // Custo Real
+	int faltaAteObjetivo; // Custo em linha reta
 	int custoAtual;
 	
 	public void gerarCustoAtual()

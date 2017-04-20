@@ -14,8 +14,8 @@ public class MetroDeParis {
 	static ArrayList<Integer> estacaoAmarela = new ArrayList<>(Arrays.asList(10, 2, 9, 8, 5, 7));
 	static ArrayList<Integer> estacaoVerde = new ArrayList<>(Arrays.asList(12, 8, 4, 13, 14));
 	static int custo = 0;
-	static int origem = 2;
-	static int destino = 1;
+	static int origem = 11;
+	static int destino = 7;
 	static int tempo = 0;
 	
 	public static void main(String[] args)
@@ -52,42 +52,66 @@ public class MetroDeParis {
 	{
 		if(estacaoAtual.noPai!= null)
 			imprimeNos(estacaoAtual.noPai);
-		System.out.println("Passei pelo nó = "  + estacaoAtual.estadoAtual + " custo = " + estacaoAtual.distanciaPercorrida );
+		System.out.println("Passei pelo nó = "  + estacaoAtual.estadoAtual + " Percorri = " + estacaoAtual.distanciaPercorrida + " Custo Atual: " + estacaoAtual.custoAtual + " Heurística:" + estacaoAtual.faltaAteObjetivo );
 	}
 	
 	public static int getTempoTotal(No estadoAtual)
 	{
 		tempo += estadoAtual.getCustoAtual() * 2;
-		while(estadoAtual.noPai != null)
+			
+		
+		while(estadoAtual.noPai != null && estadoAtual.noPai.noPai != null)
 		{
-			//if(!verificaSeEntaoNaMesmaLinha(estadoAtual.estadoAtual, estadoAtual.noPai.estadoAtual))
-			//	tempo += 5;
+			if(!verificaSeEntaoNaMesmaLinha(estadoAtual.estadoAtual, estadoAtual.noPai.estadoAtual, estadoAtual.noPai.noPai.estadoAtual))
+				tempo += 5;
 			
 			estadoAtual = estadoAtual.noPai;
 		}
 		return tempo;
 	}
 	
-	public static boolean verificaSeEntaoNaMesmaLinha(int estacaoAtual, int estadoFilho)
+	public static boolean verificaSeEntaoNaMesmaLinha(int estacaoAtual, int estadoFilho, int estadoFilhoDoFilho)
 	{
+		int contemFilho = 0;
+		int contemFilhoDoFilho = 0;
 		ArrayList<Linhas> linhasEstacaoAtual = getLinha(estacaoAtual);
 		ArrayList<Linhas> linhasEstacaoFilho = getLinha(estadoFilho);
+		ArrayList<Linhas> linhasEstacaoFilhoDoFilho = getLinha(estadoFilhoDoFilho);
 	
-		if(linhasEstacaoAtual.size() == 2)
-			return false;
-		else if(linhasEstacaoFilho.size() == 2)
-			return false;
-		
-		return true;
-	/*	for(int i = 0; i < linhasEstacaoAtual.size(); i++)
+		for(Linhas linhaAtual : linhasEstacaoFilho)
 		{
-			for(int a = 0; a < linhasEstacaoFilho.size(); a++)
+			if(linhasEstacaoAtual.contains(linhaAtual))
 			{
-				if(linhasEstacaoAtual.get(i) == linhasEstacaoFilho.get(a))
-					return true;
+				++contemFilho;
+			}
+			if(linhasEstacaoFilhoDoFilho.contains(linhaAtual))
+			{
+				++contemFilho;
 			}
 		}
-		return false; */
+		
+		int diferente = 0, igual = 0;
+		if(contemFilho == 2)
+		{
+			for (Linhas linha : linhasEstacaoFilhoDoFilho) 
+			{
+				if(linhasEstacaoAtual.contains(linha))
+				{
+					 ++igual;
+				}
+				else
+				{
+					++diferente;
+				}
+			}
+		}
+		
+		if((contemFilho == 2 && igual == 0) || (contemFilho == 2 && igual == 1 && diferente == 1))
+		{
+			return false;
+		}
+		else
+			return true;
 	}
 	
 	public static ArrayList<No> expande( No estadoAtual)
@@ -95,18 +119,49 @@ public class MetroDeParis {
 		ArrayList<No> novosNos = new ArrayList<No>();
 		for(int i = 0; i < 17; i++)
 		{
-				if(custoReal[i][0] == estadoAtual.getEstadoAtual())
+			for(int a = 0 ; a < 2 ; a++)
+			{
+				if(custoReal[i][a] == estadoAtual.getEstadoAtual())
 				{
 					No novo = new No();
-					
-					novo.setEstadoAtual(custoReal[i][1]);
-					novo.setFaltaAteObjetivo(custosEmLinhaReta[custoReal[i][1]][destino]);
-				    novo.setNoPai(estadoAtual);
+					if(a == 0)
+					{
+						if(estadoAtual.getEstadoAtual() == origem) // Significa que ele não tem pai.
+						{
+							novo.setEstadoAtual(custoReal[i][a + 1]);
+							novo.setFaltaAteObjetivo(custosEmLinhaReta[custoReal[i][a + 1]][destino]);
+						}
+						if(estadoAtual.noPai != null)
+						{
+							if(custoReal[i][a + 1] != estadoAtual.noPai.estadoAtual)
+							{
+								novo.setEstadoAtual(custoReal[i][a + 1]);
+								novo.setFaltaAteObjetivo(custosEmLinhaReta[custoReal[i][a + 1]][destino]);
+							}
+						}
+					}
+					else if(a == 1)
+					{
+						if(estadoAtual.getEstadoAtual() == origem) // Significa que ele não tem pai.
+						{
+								novo.setEstadoAtual(custoReal[i][a - 1]);
+								novo.setFaltaAteObjetivo(custosEmLinhaReta[custoReal[i][a - 1]][destino]);
+						}
+						if(estadoAtual.noPai != null)
+						{
+							if(custoReal[i][a - 1] != estadoAtual.noPai.estadoAtual)
+							{
+								novo.setEstadoAtual(custoReal[i][a - 1]);
+								novo.setFaltaAteObjetivo(custosEmLinhaReta[custoReal[i][a - 1]][destino]);
+							}
+						}
+					}
+					novo.setNoPai(estadoAtual);
 					novo.setDistanciaPercorrida(getDistanciaPercorrida(novo));
 					novo.gerarCustoAtual();
-				
 					novosNos.add(novo);
 				}
+			}
 			}
 		return novosNos;
 	}
@@ -131,11 +186,40 @@ public class MetroDeParis {
 		int somatorio = 0;
 		while(estacaoAtual.noPai != null)
 		{
-			somatorio += custosEmLinhaReta[estacaoAtual.estadoAtual][estacaoAtual.noPai.estadoAtual];
+			somatorio += getCustoEntreEstacoes(estacaoAtual.estadoAtual, estacaoAtual.noPai.estadoAtual);
 			estacaoAtual = estacaoAtual.noPai;
 		}
 		return somatorio;
 	}
+	
+	public static int getCustoEntreEstacoes(int estacao_a, int estacao_b)
+	{
+		for(int i = 0; i < 17; i++)
+		{
+			for(int a = 0 ; a < 2 ; a++)
+			{
+				if(a == 0)
+				{
+					if((custoReal[i][a] == estacao_a && custoReal[i][a + 1] == estacao_b) ||
+					   (custoReal[i][a + 1] == estacao_a && custoReal[i][a] == estacao_b))
+					{
+						return custoReal[i][2];
+					}
+				}
+				
+				if(a == 1)
+				{
+					if((custoReal[i][a] == estacao_a && custoReal[i][a - 1] == estacao_b) ||
+					   (custoReal[i][a - 1] == estacao_a && custoReal[i][a] == estacao_b))
+					{
+						return custoReal[i][2];
+					}
+				}
+			}
+		}
+		return 0;
+	}
+	
 	
 	@SuppressWarnings("unchecked")
 	public static ArrayList<No> ordenaEstados(ArrayList<No> estados)
@@ -156,7 +240,7 @@ public class MetroDeParis {
 	{
 		No novo = new No();
 		novo.setDistanciaPercorrida(0);
-		novo.setFaltaAteObjetivo(custosEmLinhaReta[origem][destino]); // adiciona meu custo no valor 
+		novo.setFaltaAteObjetivo(custosEmLinhaReta[origem][destino]);
 		novo.gerarCustoAtual();
 		novo.setEstadoAtual(origem);
 		
