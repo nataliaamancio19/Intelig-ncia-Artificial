@@ -1,21 +1,20 @@
 package codigoFonte;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 public class No {
 
 	No noPai;
 	int estadoAtual;
-	int distanciaPercorrida; // Custo Real
-	int faltaAteObjetivo; // Custo em linha reta
-	int custoAtual;
-	
-	public void gerarCustoAtual()
-	{
-		custoAtual = distanciaPercorrida + faltaAteObjetivo;
-	}
-	
+	private Double custoEmMin; // Custo Real
+	private Double faltaAteObjetivo; // Custo em linha reta
+	private Collection<Linha> linhas;
+
 	public No getNoPai() {
 		return noPai;
 	}
+
 	public void setNoPai(No noPai) {
 		this.noPai = noPai;
 	}
@@ -23,26 +22,44 @@ public class No {
 	public int getEstadoAtual() {
 		return estadoAtual;
 	}
+
 	public void setEstadoAtual(int estadoAtual) {
 		this.estadoAtual = estadoAtual;
 	}
-	
-	public int getDistanciaPercorrida() {
-		return distanciaPercorrida;
+
+	public Double getCustoEmMin() {
+		return custoEmMin;
 	}
-	public void setDistanciaPercorrida(int distanciaPercorrida) {
-		this.distanciaPercorrida = distanciaPercorrida;
+
+	public void adicionarLinhas(Collection<Linha> linhas) {
+		this.linhas = linhas;
 	}
-	public int getFaltaAteObjetivo() {
+
+	public Boolean possuiLinha(Linha linha) {
+		return this.linhas.contains(linha);
+	}
+
+	public Linha getLinhasIguais(No no) {
+		Linha linhaIgual = null;
+		for (Linha linha : linhas) {
+			if (no.possuiLinha(linha)) {
+				linhaIgual = linha;
+				break;
+			}
+		}
+		return linhaIgual;
+	}
+
+	public void setCustoEmMin(Double custoEmMin) {
+		this.custoEmMin = custoEmMin;
+	}
+
+	public Double getFaltaAteObjetivo() {
 		return faltaAteObjetivo;
 	}
-	public void setFaltaAteObjetivo(int faltaAteObjetivo) {
+
+	public void setFaltaAteObjetivo(Double faltaAteObjetivo) {
 		this.faltaAteObjetivo = faltaAteObjetivo;
 	}
-	public int getCustoAtual() {
-		return custoAtual;
-	}
-	public void setCustoAtual(int custoAtual) {
-		this.custoAtual = custoAtual;
-	}
+
 }

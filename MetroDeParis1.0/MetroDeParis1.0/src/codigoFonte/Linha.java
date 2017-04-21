@@ -1,6 +1,6 @@
 package codigoFonte;
 
-public enum Linhas {
+public enum Linha {
 	
 	Amarela, 
 	Azul,
