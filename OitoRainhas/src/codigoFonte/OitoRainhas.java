@@ -9,6 +9,8 @@ import java.util.List;
 
 public class OitoRainhas {
 
+	
+	static int contador = 0;
 	public static void main(String[] args)
 	{
 		Estado inicial = getEstadoInicial();
@@ -42,16 +44,19 @@ public class OitoRainhas {
 		}while(getQtdChoques(estadoAtual.getEstadoAtual()) != 0);
 		
 		imprimeSolucao(estadoAtual);
+		System.out.println("Qtd de passos : " + contador);
 	}
 	
 	
 	public static void imprimeSolucao(Estado estadoAtual)
-	{
+	{ 
+		
 		if(estadoAtual.estadoAnterior != null)
 		{
+			++ contador;
 			imprimeSolucao(estadoAtual.estadoAnterior);
 		}
-		imprimirTabuleiro(estadoAtual.estadoAtual);
+		imprimirTabuleiro(estadoAtual);
 	}
 	
 	public static List<Estado> permutaPosicoes(int posicao, Estado estado)
@@ -76,6 +81,7 @@ public class OitoRainhas {
 		return estadosPermutados;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static List<Estado> ordenaEstados(List<Estado> estados)
 	{
 		
@@ -90,13 +96,14 @@ public class OitoRainhas {
 		 return estados;
 	}
 	
-	public static void imprimirTabuleiro(Integer[] estadoAtual)
+	public static void imprimirTabuleiro(Estado estadoAtual)
 	{
+		System.out.println("Qtd de choques: " + estadoAtual.qtdChoques);
 		for(int i = 1; i <= 8; i++) // linhas
 		{
 			for(int a = 1; a <= 8; a++) // colunas
 			{
-			if(estadoAtual[i] == a)
+			if(estadoAtual.estadoAtual[i] == a)
 					System.out.print(" R  ");
 			else 
 					System.out.print(" *  ");
@@ -150,7 +157,7 @@ public class OitoRainhas {
 		inicial[7] = 8;
 		inicial[8] = 6; */
 		
-		/*inicial[0] = 0;
+		inicial[0] = 0;
 		inicial[1] = 1;
 		inicial[2] = 5;
 		inicial[3] = 3;
@@ -158,7 +165,17 @@ public class OitoRainhas {
 		inicial[5] = 2;
 		inicial[6] = 6;
 		inicial[7] = 7;
-		inicial[8] = 8; */
+		inicial[8] = 8; 
+		
+		inicial[0] = 0;
+		inicial[1] = 1;
+		inicial[2] = 3;
+		inicial[3] = 5;
+		inicial[4] = 2;
+		inicial[5] = 4;
+		inicial[6] = 7;
+		inicial[7] = 8;
+		inicial[8] = 6; 
 		
 		Estado estadoInicial = new Estado();
 		estadoInicial.setEstadoAtual(inicial);

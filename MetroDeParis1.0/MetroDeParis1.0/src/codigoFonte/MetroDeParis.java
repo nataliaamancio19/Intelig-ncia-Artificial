@@ -70,9 +70,6 @@ public class MetroDeParis {
 
 		} while (estadoAtual.getEstadoAtual() != destino);
 
-		System.out.println("Custo Total (Km): " + custo);
-		// tempo = getTempoTotal(estadoAtual);
-		System.out.println("Tempo Total (Km): " + tempo);
 		imprimeNos(estadoAtual);
 
 	}

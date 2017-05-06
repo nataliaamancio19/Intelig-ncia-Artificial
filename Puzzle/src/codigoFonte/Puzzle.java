@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Puzzle {
 
+	static int contador = 0;
 	public static void main(String[] args) {
 		
 		HashSet<No> estadosJaVisitados = new HashSet<No>();
@@ -13,7 +14,7 @@ public class Puzzle {
         No estadoAtual = new No();
         String[][] objetivo = preencherObjetivo();
         List<No> filaDeEstados = new ArrayList<No>();
-       
+        
         filaDeEstados.add(puzzle);
         
         do
@@ -41,6 +42,7 @@ public class Puzzle {
         {
         	imprimeSolucao(estadoAtual);
         }  
+       System.out.println("Quantidade de passos: " + contador);
     }
 	
 	public static void expande(List<No> filaDeEstados, No estadoAtual)
@@ -133,7 +135,8 @@ public class Puzzle {
 	public static void imprimeSolucao(No estadoAtual)
 	{
 		if(estadoAtual.noPai != null)
-		{
+		{ 
+			++contador;
 			imprimeSolucao(estadoAtual.noPai);
 		}
 		imprimirEstadoAtual(estadoAtual.noAtual);
@@ -141,7 +144,7 @@ public class Puzzle {
 	
 	public static No preencherPuzzle()
 	{
-		String[][] puzzle = { { "7", "2", "4" }, { "5", " ", "6" }, { "8", "3", "1" } };
+		//String[][] puzzle = { { "7", "2", "4" }, { "5", " ", "6" }, { "8", "3", "1" } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "4", "5", "6" }, { "8", "7", " " } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "4", "5", "6" }, { "7", "8", " " } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "5", "4", " " }, { "7", "8", "6" } };
@@ -161,7 +164,7 @@ public class Puzzle {
 		//String[][] puzzle = { { "1", "2", "3" }, { "4", "8", "5" }, { "7", " ", "6" } };
 		//String[][] puzzle = { { "1", "2", "3" }, { "4", "8", "5" }, { " ", "7", "6" } };
 		//String[][] puzzle = { { "1", "2", "3" }, { " ", "8", "5" }, { "4", "7", "6" } };
-		//String[][] puzzle = { { " ", "2", "3" }, { "1", "8", "5" }, { "4", "7", "6" } };
+		String[][] puzzle = { { " ", "2", "3" }, { "1", "8", "5" }, { "4", "7", "6" } };
         //String[][] puzzle = { { "1", "2", "3" }, { "4", "5", " " }, { "7", "8", "6" } };
 	    //String[][] puzzle = { { "1", "2", " " }, { "4", "5", "3" }, { "7", "8", "6" } };
        
@@ -173,8 +176,10 @@ public class Puzzle {
 
 	public static String[][] preencherObjetivo()
 	    {
-	        String[][] puzzle = {{" ", "1", "2"}, { "3", "4", "5",}, {"6", "7", "8"}};
-	    return puzzle;
+	       // String[][] puzzle = {{" ", "1", "2"}, { "3", "4", "5",}, {"6", "7", "8"}};
+	        String[][] puzzle = {{"1", "2", "3"}, { "4", "5", "6",}, {"7", "8", " "}};
+	 	   
+	        return puzzle;
 	    }
 
 	public static boolean contais(No elemento, List<No> lista)
