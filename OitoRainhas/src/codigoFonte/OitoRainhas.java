@@ -64,18 +64,21 @@ public class OitoRainhas {
 		int aux;
 		List<Estado> estadosPermutados = new ArrayList<Estado>();
 		
-		for(int a = posicao; a < 8; a++)
+		for(int b = posicao; b < 7; b++)
 		{
-			Integer[] array = estado.getEstadoAtual().clone();
-			aux = array[a + 1];
-			array[a + 1] = array[posicao];
-			array[posicao] = aux;
-			
-			Estado novoEstado = new Estado();
-			novoEstado.setEstadoAtual(array);
-			novoEstado.setEstadoAnterior(estado);
-			novoEstado.setQtdChoques(getQtdChoques(array));
-			estadosPermutados.add(novoEstado);
+			for(int a = b + 1; a < 8; a++)
+			{
+				Integer[] array = estado.getEstadoAtual().clone();
+				aux = array[b];
+				array[b] = array[a];
+				array[a] = aux;
+				
+				Estado novoEstado = new Estado();
+				novoEstado.setEstadoAtual(array);
+				novoEstado.setEstadoAnterior(estado);
+				novoEstado.setQtdChoques(getQtdChoques(array));
+				estadosPermutados.add(novoEstado);
+			}
 		}
 		
 		return estadosPermutados;
@@ -157,7 +160,7 @@ public class OitoRainhas {
 		inicial[7] = 8;
 		inicial[8] = 6; */
 		
-		inicial[0] = 0;
+		/*inicial[0] = 0;
 		inicial[1] = 1;
 		inicial[2] = 5;
 		inicial[3] = 3;
@@ -175,7 +178,7 @@ public class OitoRainhas {
 		inicial[5] = 4;
 		inicial[6] = 7;
 		inicial[7] = 8;
-		inicial[8] = 6; 
+		inicial[8] = 6; */
 		
 		Estado estadoInicial = new Estado();
 		estadoInicial.setEstadoAtual(inicial);

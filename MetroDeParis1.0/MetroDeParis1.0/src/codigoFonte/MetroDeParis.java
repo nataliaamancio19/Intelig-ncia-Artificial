@@ -47,8 +47,8 @@ public class MetroDeParis {
 	private static Double conversao = 0.5;
 
 	static int custo = 0; // em km
-	static int origem = 11;
-	static int destino = 7;
+	static int origem = 6;
+	static int destino = 8;
 	static int tempo = 0; // minutos
 
 	public static void main(String[] args) {
