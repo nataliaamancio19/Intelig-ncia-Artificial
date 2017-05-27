@@ -2,11 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-
-import codigoFonte.Estado;
+import java.util.Scanner;
 
 /*
  * A idéia principal deste conjunto de dados é preparar o algoritmo do sistema especialista, que 
@@ -28,31 +24,29 @@ public class AprendizadoDeMaquina {
 
 	static String[][] dadosOriginais = new String[120][8];
 	static float[][] dadosNormalizados = new float[120][8];
-	static float[][] dadosTreinamento = new float[80][8];
-	static float[][] dadosTeste = new float[40][8];
-	static final int TAMANHO_BASE_DE_TESTE = 40;
-	static final int TAMANHO_BASE_DE_TREINAMENTO = 80;
+	static float[][] dadosTreinamento = new float[70][8];
+	static float[][] dadosTeste = new float[50][8];
+	static final int TAMANHO_BASE_DE_TESTE = 50;
+	static final int TAMANHO_BASE_DE_TREINAMENTO = 70;
 	static final int TAMANHO_BASE_ORIGINAL = 120;
+	static Integer tabelaConfusao[][] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
 	
 	public static void main(String [] args)
 	{
-		// Qtd de números ímpares entre 1 e 11
-		float[] distancias_mais_proximas = new float[6]; 
-		int contador = 0;
 		leituraDaBaseDeDados();
 		normalizacaoDosDados();
 		separaDados();
+		 
+		Scanner ler = new Scanner(System.in);
+		System.out.println("Escolha a distância: ");
+		System.out.println("1 -  Distância Euclidiana\n2 - Distância de Manhattan\n3 - Distância de Minkowski");
+		int distancia;
+		distancia = ler.nextInt();
 		
-		// O k determina a quantidade de vizinhos mais próximos que vamos pegar
-		// daí a gente vê qual mais se repete
 		for(int k = 1; k <= 11; k = k + 2)
-		{
-			System.out.println("k = " +  k);
-			distancias_mais_proximas[contador] = calcularDistancia(k);
-			// montar a tabela
-			System.out.println("Distância mais próxima k = " + k + " : " +  distancias_mais_proximas[contador]);
-			++contador;
-		}
+			calcularDistancia(k, distancia);
+		
+		ler.close();
 	}
 	
 	public static void leituraDaBaseDeDados()
@@ -94,22 +88,10 @@ public class AprendizadoDeMaquina {
 					dadosNormalizados[a][b] = 0 ;
 				else 
 				{
-					dadosNormalizados[a][b] = Float.valueOf(dadosOriginais[a][b].replace(",","."));
+					dadosNormalizados[a][b] = Float.valueOf(dadosOriginais[a][b].replace(",",".")) / 10;
 				}
 			}
 	    }
-		
-		/* 	for(float[] linha : dadosNormalizados)
-		    {
-		    	System.out.printf("%s   ", linha[0]);
-		    	System.out.printf("%s   ", linha[1]);
-		    	System.out.printf("%s   ", linha[2]);
-		    	System.out.printf("%s   ", linha[3]);
-		    	System.out.printf("%s   ", linha[4]);
-		    	System.out.printf("%s   ", linha[5]);
-		    	System.out.printf("%s   ", linha[6]);
-		    	System.out.printf("%s\n", linha[7]);
-		    } */
 	}
 
 	public static void separaDados()
@@ -117,7 +99,7 @@ public class AprendizadoDeMaquina {
 		int linha = 0;
 		for(int a = 0; a < TAMANHO_BASE_ORIGINAL; a++)
 	    {
-			for(int b = 0; b < 6; b++)
+			for(int b = 0; b < 8; b++)
 			{
 				if(a < TAMANHO_BASE_DE_TREINAMENTO)
 					dadosTreinamento[a][b] = dadosNormalizados[a][b];
@@ -137,36 +119,38 @@ public class AprendizadoDeMaquina {
 		float mais_se_repete = 0;
 		int maiorValor = 0;
 		
-		
 		for(int a = 0; a < distancias_mais_proximas.length; a++)
 		{
 			for(int b = 0; b < distancias_mais_proximas.length; b++)
 			{
-				if(distancias_mais_proximas[a] == distancias_mais_proximas[b])
+				if(distancias_mais_proximas[a][0] == distancias_mais_proximas[b][0])
 				++contador;
 			}
-			contadores.add(contador);
-			valores.add(distancias_mais_proximas[a][0]);
+			
+			if(!valores.contains(distancias_mais_proximas[a][0]))
+			{
+				valores.add(distancias_mais_proximas[a][0]);
+				contadores.add(contador);
+			}
 			contador = 0;
 		}
 		
-		// Tenho que pegar o maior valor e vê se ele se repete, caso se repita eu pego o menor deles.(valor numérico);
+		// Pego o maior contador
 		for(int valor : contadores) {  
 		      if(valor > maiorValor) {
 		            maiorValor = valor;
 		      }
 		}
-		
-		int index_do_maior_contador = contadores.indexOf(maiorValor);
-		mais_se_repete = valores.get(index_do_maior_contador);
-		
+	
+		// Vejo se o maior contador se repete.
 		int contadorDoMaiorContador = 0;
-		
 		for(int contadorAtual : contadores)
 		{
 			if(contadorAtual == maiorValor)
 				++ contadorDoMaiorContador;
 		}
+		
+		// Pego o menor valor dos contadores.
 		float menorValor = valores.get(0);
 		if(contadorDoMaiorContador != 1)
 		{
@@ -182,7 +166,7 @@ public class AprendizadoDeMaquina {
 		return menorValor;
 	}
 	
-	public static float calcularDistancia(int k)
+	public static void calcularDistancia(int k, int distancia)
 	{
 		float[][] distancias = new float[80][2];
 		float[][] distancias_mais_proximas = new float[k][2];
@@ -192,17 +176,36 @@ public class AprendizadoDeMaquina {
 		{
 			for(int linhaTreinamento = 0; linhaTreinamento < TAMANHO_BASE_DE_TREINAMENTO; linhaTreinamento++ )
 			{
-				distancias[linhaTreinamento][0] = Math.abs(dadosTeste[linhaTeste][0] - dadosTreinamento[linhaTreinamento][0]) +
-							Math.abs(dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1]) + 
-							Math.abs(dadosTeste[linhaTeste][2] - dadosTreinamento[linhaTreinamento][2]) + 
-							Math.abs(dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3]) +
-							Math.abs(dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4]) + 
-							Math.abs(dadosTeste[linhaTeste][5] - dadosTreinamento[linhaTreinamento][5]);
+				switch (distancia) {
+				case 1: // Distância de Manhattan 
+					distancias[linhaTreinamento][0] = Math.abs(dadosTeste[linhaTeste][0] - dadosTreinamento[linhaTreinamento][0]) +
+					Math.abs(dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1]) + 
+					Math.abs(dadosTeste[linhaTeste][2] - dadosTreinamento[linhaTreinamento][2]) + 
+					Math.abs(dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3]) +
+					Math.abs(dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4]) + 
+					Math.abs(dadosTeste[linhaTeste][5] - dadosTreinamento[linhaTreinamento][5]);
+					break;
+
+				case 2: // Distância Euclidiana
+					distancias[linhaTreinamento][0] = (float) Math.sqrt((Math.pow((double)dadosTeste[linhaTeste][0] - dadosTreinamento[linhaTreinamento][0], 2) +
+							Math.pow((double)dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1], 2) + 
+							Math.pow((double)dadosTeste[linhaTeste][2] - dadosTreinamento[linhaTreinamento][2], 2) + 
+							Math.pow((double)dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3], 2) +
+							Math.pow((double)dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4], 2) + 
+							Math.pow((double)dadosTeste[linhaTeste][5] - dadosTreinamento[linhaTreinamento][5], 2)));
+					break;
+				case 3:
+					break;
+				default:
+					break;
+				}
 				
 				distancias[linhaTreinamento][1] = linhaTreinamento;
 			}
+		
+			distancias = ordenaLista(distancias);
+			int linhaTreinamentoDaMenorDistancia = 0;
 			
-			Arrays.sort(distancias);
 			for(int a = 0; a < k ; a++)
 			{
 				distancias_mais_proximas[a][0] = distancias[a][0];
@@ -211,29 +214,110 @@ public class AprendizadoDeMaquina {
 			
 			if(k == 1)
 			{
-				System.out.println("LINHA = " +  linhaTeste);
 				menor_distancia = distancias_mais_proximas[0][0];
+				linhaTreinamentoDaMenorDistancia = (int) distancias_mais_proximas[0][1];
 			}
 			else
 			{
-				System.out.println("LINHA = " +  linhaTeste);
 				menor_distancia = verificaQuemMaisSeRepete(distancias_mais_proximas, k);
+				for(int a = 0; a < distancias_mais_proximas.length; a++)
+				{
+					if(distancias_mais_proximas[a][0] == menor_distancia){
+						linhaTreinamentoDaMenorDistancia = (int) distancias_mais_proximas[a][1];
+						break;
+					}
+				}
 			}
-			int linhaTreinamentoDaMenorDistancia = 0;
-			for(int a = 0; a < distancias_mais_proximas.length; a++)
-			{
-				if(distancias_mais_proximas[a][0] == menor_distancia)
-					linhaTreinamentoDaMenorDistancia = (int) distancias_mais_proximas[a][1];
-			}
+		
+			int classeObtida = 0, classeEsperada = 0;
 			
-			if(dadosTeste[linhaTeste][5] == dadosTreinamento[linhaTreinamentoDaMenorDistancia][5]
-					&& dadosTeste[linhaTeste][6] == dadosTreinamento[linhaTreinamentoDaMenorDistancia][6])
-			{
-				System.out.println("ACERTOU");
+			if(dadosTeste[linhaTeste][6] == 0 && dadosTeste[linhaTeste][7] == 0)
+				classeEsperada = 0;
+			else if(dadosTeste[linhaTeste][6] == 0 && dadosTeste[linhaTeste][7] == 1)
+				classeEsperada = 1;
+			else if(dadosTeste[linhaTeste][6] == 1 && dadosTeste[linhaTeste][7] == 0)
+				classeEsperada = 2;
+			else if(dadosTeste[linhaTeste][6] == 1 && dadosTeste[linhaTeste][7] == 1)
+				classeEsperada = 3;
+			
+			if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 0 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 0)
+				classeObtida = 0;
+			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 0 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 1)
+				classeObtida = 1;
+			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 1 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 0)
+				classeObtida = 2;
+			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 1 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 1)
+				classeObtida = 3;
+			
+			++tabelaConfusao[classeObtida][classeEsperada];
 			}
-			else
-				System.out.println("ERROU");
-		}
-		return 0;
+		imprimeTabelaConfusao(k);
+		zerarTabelaConfusao();
 	}
+	
+	public static void zerarTabelaConfusao()
+	{
+		for(int a = 0; a < 4; a++)
+		{
+			for(int b = 0; b < 4 ; b++)
+			{
+				tabelaConfusao[a][b] = 0;
+			}
+		}
+	}
+	
+ 	public static void imprimeTabelaConfusao(int k)
+	{
+		System.out.println("\n\nTabela confusão k = " +  k + "\n");
+	
+		System.out.println("I - Não possue nenhuma inflamação.");
+		System.out.println("II - Inflamação da bexiga urinária.");
+		System.out.println("III - Nefrite de origem da pelve renal.");
+		System.out.println("IV - Inflamação da bexiga urinária e Nefrite de origem da pelve renal.\n\n");
+		
+		System.out.println("    I  II  III  IV");
+		
+		for(int a = 0; a < 4; a++)
+		{
+			for(int b = 0; b < 4 ; b++)
+			{
+				if(a == 0 && b == 0)
+					System.out.print(" I  ");
+				else if(a == 1 && b == 0)
+					System.out.print("II  ");
+				else if(a == 2 && b == 0)
+					System.out.print("III ");
+				else if(a == 3 && b == 0)
+					System.out.print("IV  ");
+					
+				if(b != 3)
+					System.out.print(tabelaConfusao[a][b] + "   ");
+				else 
+					System.out.println(tabelaConfusao[a][b]);
+			}
+		}
+	}
+	
+	public static float[][] ordenaLista(float[][] listaParaSerOrdenada)
+	{
+		float auxLinha, auxDistancia;
+		
+		for(int a = 0; a < listaParaSerOrdenada.length; a++)
+		{
+			for(int b = 0; b < listaParaSerOrdenada.length; b++)
+			{
+				if(listaParaSerOrdenada[a][0] < listaParaSerOrdenada[b][0])
+				{
+					auxDistancia = listaParaSerOrdenada[a][0];
+					listaParaSerOrdenada[a][0] = listaParaSerOrdenada[b][0];
+					listaParaSerOrdenada[b][0] = auxDistancia;
+					
+					auxLinha = listaParaSerOrdenada[a][1];
+					listaParaSerOrdenada[a][1] = listaParaSerOrdenada[b][1];
+					listaParaSerOrdenada[b][1] = auxLinha;
+				}
+			}
+		}
+		return listaParaSerOrdenada;
+	} 
 }
