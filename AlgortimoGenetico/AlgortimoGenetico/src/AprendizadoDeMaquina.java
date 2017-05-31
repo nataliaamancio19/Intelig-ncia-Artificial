@@ -22,14 +22,14 @@ import java.util.Scanner;
 
 public class AprendizadoDeMaquina {
 
-	static String[][] dadosOriginais = new String[120][8];
-	static float[][] dadosNormalizados = new float[120][8];
-	static float[][] dadosTreinamento = new float[70][8];
-	static float[][] dadosTeste = new float[50][8];
-	static final int TAMANHO_BASE_DE_TESTE = 50;
-	static final int TAMANHO_BASE_DE_TREINAMENTO = 70;
-	static final int TAMANHO_BASE_ORIGINAL = 120;
-	static Integer tabelaConfusao[][] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+	static String[][] dadosOriginais = new String[625][5];
+	static int[][] dadosNormalizados = new int[625][5];
+	static int[][] dadosTreinamento = new int[400][5];
+	static int[][] dadosTeste = new int[225][5];
+	static final int TAMANHO_BASE_DE_TESTE = 225;
+	static final int TAMANHO_BASE_DE_TREINAMENTO = 400;
+	static final int TAMANHO_BASE_ORIGINAL = 625;
+	static Integer tabelaConfusao[][] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
 	
 	public static void main(String [] args)
 	{
@@ -52,7 +52,7 @@ public class AprendizadoDeMaquina {
 	public static void leituraDaBaseDeDados()
 	{	
 		//String nome = "C:\\Users\\Aluno\\workspace\\AlgortimoGenetico\\src\\diagnostico.txt";
-	    String nome = "C:\\Users\\Natália\\workspace\\AlgortimoGenetico\\src\\diagnostico.txt"; 
+	    String nome = "C:\\Users\\Natália\\Documents\\GitHub\\Inteligencia-Artificial\\AlgortimoGenetico\\AlgortimoGenetico\\src\\balance.txt"; 
 	    int contador = 0;
 	    try 
 	    {
@@ -62,7 +62,7 @@ public class AprendizadoDeMaquina {
 	      
 	      while (linha != null) {
 	    
-	    	dadosOriginais[contador] = linha.split("\t");
+	    	dadosOriginais[contador] = linha.split(",");
 	    
 	        linha = lerArq.readLine(); 
 	        ++contador;
@@ -80,15 +80,17 @@ public class AprendizadoDeMaquina {
 	{
 		for(int a = 0; a < TAMANHO_BASE_ORIGINAL; a++)
 	    {
-			for(int b = 0; b < 8; b++)
+			for(int b = 0; b < 5; b++)
 			{
-				if(dadosOriginais[a][b].equals("yes"))
-					dadosNormalizados[a][b] = 1 ;
-				else if(dadosOriginais[a][b].equals("no"))
+				if(dadosOriginais[a][b].equals("L"))
 					dadosNormalizados[a][b] = 0 ;
+				else if(dadosOriginais[a][b].equals("B"))
+					dadosNormalizados[a][b] = 1 ;
+				else if(dadosOriginais[a][b].equals("R"))
+					dadosNormalizados[a][b] = 2 ;
 				else 
 				{
-					dadosNormalizados[a][b] = Float.valueOf(dadosOriginais[a][b].replace(",",".")) / 10;
+					dadosNormalizados[a][b] = Integer.valueOf(dadosOriginais[a][b]);
 				}
 			}
 	    }
@@ -99,7 +101,7 @@ public class AprendizadoDeMaquina {
 		int linha = 0;
 		for(int a = 0; a < TAMANHO_BASE_ORIGINAL; a++)
 	    {
-			for(int b = 0; b < 8; b++)
+			for(int b = 0; b < 5; b++)
 			{
 				if(a < TAMANHO_BASE_DE_TREINAMENTO)
 					dadosTreinamento[a][b] = dadosNormalizados[a][b];
@@ -168,7 +170,7 @@ public class AprendizadoDeMaquina {
 	
 	public static void calcularDistancia(int k, int distancia)
 	{
-		float[][] distancias = new float[80][2];
+		float[][] distancias = new float[400][2];
 		float[][] distancias_mais_proximas = new float[k][2];
 		float menor_distancia;
 		
@@ -178,21 +180,17 @@ public class AprendizadoDeMaquina {
 			{
 				switch (distancia) {
 				case 1: // Distância de Manhattan 
-					distancias[linhaTreinamento][0] = Math.abs(dadosTeste[linhaTeste][0] - dadosTreinamento[linhaTreinamento][0]) +
-					Math.abs(dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1]) + 
+					distancias[linhaTreinamento][0] = Math.abs(dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1]) + 
 					Math.abs(dadosTeste[linhaTeste][2] - dadosTreinamento[linhaTreinamento][2]) + 
-					Math.abs(dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3]) +
-					Math.abs(dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4]) + 
-					Math.abs(dadosTeste[linhaTeste][5] - dadosTreinamento[linhaTreinamento][5]);
+					Math.abs(dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3]) + 
+					Math.abs(dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4]);
 					break;
 
 				case 2: // Distância Euclidiana
-					distancias[linhaTreinamento][0] = (float) Math.sqrt((Math.pow((double)dadosTeste[linhaTeste][0] - dadosTreinamento[linhaTreinamento][0], 2) +
-							Math.pow((double)dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1], 2) + 
+					distancias[linhaTreinamento][0] = (float) Math.sqrt((Math.pow((double)dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1], 2) +
 							Math.pow((double)dadosTeste[linhaTeste][2] - dadosTreinamento[linhaTreinamento][2], 2) + 
-							Math.pow((double)dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3], 2) +
-							Math.pow((double)dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4], 2) + 
-							Math.pow((double)dadosTeste[linhaTeste][5] - dadosTreinamento[linhaTreinamento][5], 2)));
+							Math.pow((double)dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3], 2) + 
+							Math.pow((double)dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4], 2)));
 					break;
 				case 3:
 					break;
@@ -231,24 +229,20 @@ public class AprendizadoDeMaquina {
 		
 			int classeObtida = 0, classeEsperada = 0;
 			
-			if(dadosTeste[linhaTeste][6] == 0 && dadosTeste[linhaTeste][7] == 0)
+			if(dadosTeste[linhaTeste][0] == 0 )
 				classeEsperada = 0;
-			else if(dadosTeste[linhaTeste][6] == 0 && dadosTeste[linhaTeste][7] == 1)
+			else if(dadosTeste[linhaTeste][0] == 1)
 				classeEsperada = 1;
-			else if(dadosTeste[linhaTeste][6] == 1 && dadosTeste[linhaTeste][7] == 0)
+			else if(dadosTeste[linhaTeste][0] == 2)
 				classeEsperada = 2;
-			else if(dadosTeste[linhaTeste][6] == 1 && dadosTeste[linhaTeste][7] == 1)
-				classeEsperada = 3;
 			
-			if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 0 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 0)
+			if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][0] == 0)
 				classeObtida = 0;
-			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 0 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 1)
+			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][0] == 1)
 				classeObtida = 1;
-			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 1 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 0)
+			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][0] == 2)
 				classeObtida = 2;
-			else if(dadosTreinamento[linhaTreinamentoDaMenorDistancia][6] == 1 && dadosTreinamento[linhaTreinamentoDaMenorDistancia][7] == 1)
-				classeObtida = 3;
-			
+		
 			++tabelaConfusao[classeObtida][classeEsperada];
 			}
 		imprimeTabelaConfusao(k);
@@ -257,9 +251,9 @@ public class AprendizadoDeMaquina {
 	
 	public static void zerarTabelaConfusao()
 	{
-		for(int a = 0; a < 4; a++)
+		for(int a = 0; a < 3; a++)
 		{
-			for(int b = 0; b < 4 ; b++)
+			for(int b = 0; b < 3 ; b++)
 			{
 				tabelaConfusao[a][b] = 0;
 			}
@@ -270,16 +264,15 @@ public class AprendizadoDeMaquina {
 	{
 		System.out.println("\n\nTabela confusão k = " +  k + "\n");
 	
-		System.out.println("I - Não possue nenhuma inflamação.");
-		System.out.println("II - Inflamação da bexiga urinária.");
-		System.out.println("III - Nefrite de origem da pelve renal.");
-		System.out.println("IV - Inflamação da bexiga urinária e Nefrite de origem da pelve renal.\n\n");
+		System.out.println("I - Esquerda");
+		System.out.println("II - Balanceado");
+		System.out.println("III - Direita");
 		
-		System.out.println("    I  II  III  IV");
+		System.out.println("    I  II  III ");
 		
-		for(int a = 0; a < 4; a++)
+		for(int a = 0; a < 3; a++)
 		{
-			for(int b = 0; b < 4 ; b++)
+			for(int b = 0; b < 3 ; b++)
 			{
 				if(a == 0 && b == 0)
 					System.out.print(" I  ");
@@ -287,10 +280,8 @@ public class AprendizadoDeMaquina {
 					System.out.print("II  ");
 				else if(a == 2 && b == 0)
 					System.out.print("III ");
-				else if(a == 3 && b == 0)
-					System.out.print("IV  ");
 					
-				if(b != 3)
+				if(b != 2)
 					System.out.print(tabelaConfusao[a][b] + "   ");
 				else 
 					System.out.println(tabelaConfusao[a][b]);
