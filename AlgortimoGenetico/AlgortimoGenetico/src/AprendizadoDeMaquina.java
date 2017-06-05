@@ -24,10 +24,10 @@ public class AprendizadoDeMaquina {
 
 	static String[][] dadosOriginais = new String[625][5];
 	static int[][] dadosNormalizados = new int[625][5];
-	static int[][] dadosTreinamento = new int[400][5];
-	static int[][] dadosTeste = new int[225][5];
-	static final int TAMANHO_BASE_DE_TESTE = 225;
-	static final int TAMANHO_BASE_DE_TREINAMENTO = 400;
+	static int[][] dadosTreinamento = new int[350][5];
+	static int[][] dadosTeste = new int[275][5];
+	static final int TAMANHO_BASE_DE_TESTE = 275;
+	static final int TAMANHO_BASE_DE_TREINAMENTO = 350;
 	static final int TAMANHO_BASE_ORIGINAL = 625;
 	static Integer tabelaConfusao[][] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
 	
@@ -193,6 +193,10 @@ public class AprendizadoDeMaquina {
 							Math.pow((double)dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4], 2)));
 					break;
 				case 3:
+					distancias[linhaTreinamento][0] = (float) Math.cbrt((Math.pow((double)dadosTeste[linhaTeste][1] - dadosTreinamento[linhaTreinamento][1], 3) +
+							Math.pow((double)dadosTeste[linhaTeste][2] - dadosTreinamento[linhaTreinamento][2], 3) + 
+							Math.pow((double)dadosTeste[linhaTeste][3] - dadosTreinamento[linhaTreinamento][3], 3) + 
+							Math.pow((double)dadosTeste[linhaTeste][4] - dadosTreinamento[linhaTreinamento][4], 3)));
 					break;
 				default:
 					break;
