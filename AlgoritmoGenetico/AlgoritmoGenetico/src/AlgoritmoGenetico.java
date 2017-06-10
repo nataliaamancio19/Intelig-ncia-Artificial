@@ -11,6 +11,7 @@ public class AlgoritmoGenetico {
 	static int contador = 0;
 	static final int TAMANHO_D0_ARRAY = 8;
 	static List<Estado> populacaoGeral;
+	static double mutacao = 0.01;
 	
 	public static void main(String[] args)
 	{
@@ -67,6 +68,7 @@ public class AlgoritmoGenetico {
 		int contador = 0;
 		String[] mae, pai;
 		Estado filho1, filho2;
+		double aleatorio;
 		populacaoGeral = new ArrayList<Estado>();
 		for(int a = 0; a < 24; a++)
 		{
@@ -101,6 +103,24 @@ public class AlgoritmoGenetico {
 						elemento1 += mae[contador];
 					++contador;
 					
+					// mutacao
+					aleatorio = random.nextDouble();
+					if( aleatorio <= mutacao) 
+					{
+						String[] elementosSeparados = elemento1.split("");
+						if(elementosSeparados[c].equals("1"))
+							elementosSeparados[c] = "0";
+						else if(elementosSeparados[c].equals("0"))
+							elementosSeparados[c] = "1";
+						
+						elemento1 = "";
+						for (String bit : elementosSeparados) {
+							elemento1 += bit;
+						}
+					}
+						
+					
+					
 					if(c == 2)
 					{
 						filho1.estadoAtual[b] = elemento1;
@@ -113,6 +133,22 @@ public class AlgoritmoGenetico {
 							else if(auxiliar[d].equals("0"))
 								elemento2 += "1";
 							
+							//mutação
+							aleatorio = random.nextDouble();
+							if( aleatorio <= mutacao) 
+							{
+								String[] elementosSeparados = elemento2.split("");
+								if(elementosSeparados[d].equals("1"))
+									elementosSeparados[d] = "0";
+								else if(elementosSeparados[d].equals("0"))
+									elementosSeparados[d] = "1";
+								
+								elemento2 = "";
+								for (String bit : elementosSeparados) {
+									elemento2 += bit;
+								}
+							}
+								
 							if(d == 2)
 								filho2.estadoAtual[b] = elemento2;
 						}
