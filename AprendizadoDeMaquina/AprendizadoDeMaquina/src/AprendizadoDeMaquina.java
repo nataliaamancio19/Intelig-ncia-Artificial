@@ -52,7 +52,7 @@ public class AprendizadoDeMaquina {
 	public static void leituraDaBaseDeDados()
 	{	
 		//String nome = "C:\\Users\\Aluno\\workspace\\AlgortimoGenetico\\src\\diagnostico.txt";
-	    String nome = "C:\\Users\\Natália\\Documents\\GitHub\\Inteligencia-Artificial\\AlgortimoGenetico\\AlgortimoGenetico\\src\\balance.txt"; 
+	    String nome = "C:\\Users\\Natália\\Documents\\GitHub\\Inteligencia-Artificial\\AprendizadoDeMaquina\\AprendizadoDeMaquina\\src\\balance.txt"; 
 	    int contador = 0;
 	    try 
 	    {

@@ -10,56 +10,108 @@ public class AlgoritmoGenetico {
 
 	static int contador = 0;
 	static final int TAMANHO_D0_ARRAY = 8;
-	static List<Estado> populacaoGeral;
-	static double mutacao = 0.01;
+	static final int TAMANHO_DA_POPULACAO = 20;
+	static ArrayList<Estado> populacaoGeral;
+	static ArrayList<Estado> populacaoFilhos;
 	
 	public static void main(String[] args)
 	{
-		populacaoGeral = new ArrayList<Estado>();
-		geraPopulacaoInicial();
-		++contador;
-		System.out.println("Geração " + contador);
-		imprimir();
-		do
-		{
-			
-			if(verificaSeChegouNoObjetivo(populacaoGeral) == false){
-				++contador;
-				System.out.println("Geração " + contador);
-				torneio();
-				imprimir();
+			contador = 0;
+			populacaoGeral = new ArrayList<Estado>();
+			populacaoFilhos = new ArrayList<Estado>();
+			geraPopulacaoInicial();
+			++contador;
+			imprimir();
+			do
+			{
+				
+				if(verificaSeChegouNoObjetivo(populacaoGeral) == false){
+					++contador;
+					torneio();
+					imprimir();
+				}
+	
+			}while(verificaSeChegouNoObjetivo(populacaoGeral) == false && contador < 5000);
+			if(contador == 5000)
+			{
+				System.out.println("Não achou solução!");
 			}
-
-		}while(verificaSeChegouNoObjetivo(populacaoGeral) == false);
-		
-		
-		System.out.println("Qtd de passos : " + contador);
+			else
+				System.out.println("Qtd de passos : " + contador);
 	}
 	
 	public static void torneio()
 	{
+		populacaoFilhos = new ArrayList<Estado>();
 		Random random  = new Random();
 		int aleatorio;
-		Estado pai, mae;
+		Estado pai1, pai2, mae1, mae2;
 		List<Estado> maisAptos = new ArrayList<Estado>();
-		
-		for(int a = 0; a < populacaoGeral.size() ; a++)
+		int contador = 0;
+		for(int a = 0; a < populacaoGeral.size() / 2 ; a++)
 		{
 			aleatorio = random.nextInt(populacaoGeral.size()); 
-			pai = populacaoGeral.get(aleatorio);
+			pai1 = populacaoGeral.get(aleatorio);
 			
 			aleatorio = random.nextInt(populacaoGeral.size()); 
-			mae = populacaoGeral.get(aleatorio);
+			pai2 = populacaoGeral.get(aleatorio);
 			
-			if(pai.getQtdChoques() <= mae.getQtdChoques())
-				maisAptos.add(pai);
-			else 
-				maisAptos.add(mae);
+			aleatorio = random.nextInt(populacaoGeral.size()); 
+			mae1 = populacaoGeral.get(aleatorio);
+			
+			aleatorio = random.nextInt(populacaoGeral.size()); 
+			mae2 = populacaoGeral.get(aleatorio);
+			
+//			if(pai1.getQtdChoques() <= pai2.getQtdChoques())
+//				maisAptos.add(pai1);
+//			else 
+//				maisAptos.add(pai2);
+//			
+//			if(mae1.getQtdChoques() <= mae2.getQtdChoques())
+//				maisAptos.add(mae1);
+//			else 
+//				maisAptos.add(mae2);
+			
+
+			if(pai1.getQtdChoques() <= pai2.getQtdChoques())
+				pai2 = pai1;
+			
+			
+			if(mae1.getQtdChoques() <= mae2.getQtdChoques())
+				mae2 = mae1;
+			
+			crossover(pai2, mae2);
+			contador += 2;
 		}
-		crossoverEMutacao(maisAptos);
+		populacaoGeral = (ArrayList<Estado>) populacaoFilhos.clone();
+		mutacao();
 	}
 	
-	public static void crossoverEMutacao(List<Estado> maisAptos)
+	public static void mutacao()
+	{
+		Random random = new Random();
+		
+		int aleatorio = random.nextInt(TAMANHO_DA_POPULACAO);
+		String bits = "";
+		String[] arrayDeBits = new String[8];
+		
+		for(int a = 0; a < 8; a++)
+		{
+			bits += populacaoGeral.get(aleatorio).getEstadoAtual()[a];
+		}
+	
+		arrayDeBits = bits.split("");
+		
+		aleatorio = random.nextInt(24);
+		
+		if(arrayDeBits[aleatorio].equals("1"))
+			arrayDeBits[aleatorio] = "0";
+		else if(arrayDeBits[aleatorio].equals("0"))
+			arrayDeBits[aleatorio] = "1";
+		
+	}
+	
+	public static void crossover(Estado estado_mae, Estado estado_pai)
 	{
 		Random random = new Random();
 		String[] mascaraAleatoria = new String[24];
@@ -69,19 +121,16 @@ public class AlgoritmoGenetico {
 		String[] mae, pai;
 		Estado filho1, filho2;
 		double aleatorio;
-		populacaoGeral = new ArrayList<Estado>();
+		
 		for(int a = 0; a < 24; a++)
 		{
 			mascaraAleatoria[a] = Integer.toString(random.nextInt(2));
 		}
 		
-		
-		for (int i = 0; i < (maisAptos.size() / 2); i++) // Aqui eu faço em ordem.
-		{
 			for(int a = 0; a < 8; a++)
 			{
-				papai += maisAptos.get(i).getEstadoAtual()[a];
-				mamae += maisAptos.get(i + 1).getEstadoAtual()[a];
+				papai += estado_mae.getEstadoAtual()[a];
+				mamae += estado_pai.getEstadoAtual()[a];
 			}
 			
 			pai = papai.split("");
@@ -103,24 +152,6 @@ public class AlgoritmoGenetico {
 						elemento1 += mae[contador];
 					++contador;
 					
-					// mutacao
-					aleatorio = random.nextDouble();
-					if( aleatorio <= mutacao) 
-					{
-						String[] elementosSeparados = elemento1.split("");
-						if(elementosSeparados[c].equals("1"))
-							elementosSeparados[c] = "0";
-						else if(elementosSeparados[c].equals("0"))
-							elementosSeparados[c] = "1";
-						
-						elemento1 = "";
-						for (String bit : elementosSeparados) {
-							elemento1 += bit;
-						}
-					}
-						
-					
-					
 					if(c == 2)
 					{
 						filho1.estadoAtual[b] = elemento1;
@@ -133,21 +164,6 @@ public class AlgoritmoGenetico {
 							else if(auxiliar[d].equals("0"))
 								elemento2 += "1";
 							
-							//mutação
-							aleatorio = random.nextDouble();
-							if( aleatorio <= mutacao) 
-							{
-								String[] elementosSeparados = elemento2.split("");
-								if(elementosSeparados[d].equals("1"))
-									elementosSeparados[d] = "0";
-								else if(elementosSeparados[d].equals("0"))
-									elementosSeparados[d] = "1";
-								
-								elemento2 = "";
-								for (String bit : elementosSeparados) {
-									elemento2 += bit;
-								}
-							}
 								
 							if(d == 2)
 								filho2.estadoAtual[b] = elemento2;
@@ -163,13 +179,12 @@ public class AlgoritmoGenetico {
 					mamae = "";
 					filho1.setQtdChoques(getQtdChoques(converteArrayParaInteiro(filho1.estadoAtual)));
 					filho2.setQtdChoques(getQtdChoques(converteArrayParaInteiro(filho2.estadoAtual)));
-					populacaoGeral.add(filho1);
-					populacaoGeral.add(filho2);
+					populacaoFilhos.add(filho1);
+					populacaoFilhos.add(filho2);
 				}
 			}
 		}
 	
-	}
 	
 	public static boolean verificaSeChegouNoObjetivo(List<Estado> populacaoAtual)
 	{
@@ -203,19 +218,19 @@ public class AlgoritmoGenetico {
 		
 		for(Estado estado : populacaoGeral)
 		{
-			estadoAtual =  converteArrayParaInteiro(estado.getEstadoAtual());
-			System.out.print("Geração : " +  contador + " (Linha, Coluna) -> ");
-			System.out.print("(0, " + estadoAtual[0] +" ) ");
-			System.out.print("(1, " + estadoAtual[1] +" ) ");
-			System.out.print("(2, " + estadoAtual[2] +" ) ");
-			System.out.print("(3, " + estadoAtual[3] +" ) ");
-			System.out.print("(4, " + estadoAtual[4] +" ) ");
-			System.out.print("(5, " + estadoAtual[5] +" ) ");
-			System.out.print("(6, " + estadoAtual[6] +" ) ");
-			if(estado.getQtdChoques() == 0)
-				System.out.println("(7, " + estadoAtual[7] +" ) -> " + estado.getQtdChoques() + " -> SOLUÇÃO");
-			else 
-				System.out.println("(7, " + estadoAtual[7] +" ) -> " + estado.getQtdChoques());
+				estadoAtual =  converteArrayParaInteiro(estado.getEstadoAtual());
+				System.out.print("Geração : " +  contador + " (Linha, Coluna) -> ");
+				System.out.print("(0, " + estadoAtual[0] +" ) ");
+				System.out.print("(1, " + estadoAtual[1] +" ) ");
+				System.out.print("(2, " + estadoAtual[2] +" ) ");
+				System.out.print("(3, " + estadoAtual[3] +" ) ");
+				System.out.print("(4, " + estadoAtual[4] +" ) ");
+				System.out.print("(5, " + estadoAtual[5] +" ) ");
+				System.out.print("(6, " + estadoAtual[6] +" ) ");
+				if(estado.getQtdChoques() == 0)
+					System.out.println("(7, " + estadoAtual[7] +" ) -> " + estado.getQtdChoques() + " -> SOLUÇÃO");
+				else 
+					System.out.println("(7, " + estadoAtual[7] +" ) -> " + estado.getQtdChoques());
 		}
 	}
 
@@ -343,7 +358,7 @@ public class AlgoritmoGenetico {
 		inicial[6] = "110";
 		inicial[7] = "111";
 		
-		for(int a = 0 ; a < 500; a++)
+		for(int a = 0 ; a < TAMANHO_DA_POPULACAO; a++)
 		{
 			auxiliar = embaralhaArray(inicial);
 			Estado estado = new Estado();
