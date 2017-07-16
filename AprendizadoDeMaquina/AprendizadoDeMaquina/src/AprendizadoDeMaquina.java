@@ -4,31 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/*
- * A idéia principal deste conjunto de dados é preparar o algoritmo do sistema especialista, que 
-	irá realizar o diagnóstico presuntivo de duas doenças do sistema urinário. Será 
-	o exemplo de diagnóstico das inflamações agudas da bexiga urinária e 
-	nefrite aguda.
-	
-	A inflamação aguda da bexiga urinária é caracterizada pela ocorrência súbita de dores na região
-	do abdômen ea micção na forma de pressão constante na urina, dores de micção e, por vezes, falta
-	de retenção de urina.
-	
-	A nefrite aguda da origem da pelve renal ocorre consideravelmente mais freqüentemente nas mulheres do que nos 
-	homens. Começa com febre repentina, que atinge, e às vezes excede 40C. A febre é acompanhada por arrepios e 
-	dores lombares de um ou ambos os lados, que às vezes são muito fortes. 
-	
- * **/
 
 public class AprendizadoDeMaquina {
 
-	static String[][] dadosOriginais = new String[625][5];
-	static int[][] dadosNormalizados = new int[625][5];
+	static String[][] dadosOriginais = new String[645][5];
+	static int[][] dadosNormalizados = new int[645][5];
 	static int[][] dadosTreinamento = new int[350][5];
-	static int[][] dadosTeste = new int[275][5];
-	static final int TAMANHO_BASE_DE_TESTE = 275;
+	static int[][] dadosTeste = new int[295][5];
+	static final int TAMANHO_BASE_DE_TESTE = 295;
 	static final int TAMANHO_BASE_DE_TREINAMENTO = 350;
-	static final int TAMANHO_BASE_ORIGINAL = 625;
+	static final int TAMANHO_BASE_ORIGINAL = 645;
 	static Integer tabelaConfusao[][] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
 	
 	public static void main(String [] args)
@@ -51,8 +36,7 @@ public class AprendizadoDeMaquina {
 	
 	public static void leituraDaBaseDeDados()
 	{	
-		//String nome = "C:\\Users\\Aluno\\workspace\\AlgortimoGenetico\\src\\diagnostico.txt";
-	    String nome = "C:\\Users\\Natália\\Documents\\GitHub\\Inteligencia-Artificial\\AprendizadoDeMaquina\\AprendizadoDeMaquina\\src\\balance.txt"; 
+		String nome = "C:\\Users\\Natália\\Documents\\GitHub\\Inteligencia-Artificial\\AprendizadoDeMaquina\\AprendizadoDeMaquina\\src\\balance.txt"; 
 	    int contador = 0;
 	    try 
 	    {
@@ -170,7 +154,7 @@ public class AprendizadoDeMaquina {
 	
 	public static void calcularDistancia(int k, int distancia)
 	{
-		float[][] distancias = new float[400][2];
+		float[][] distancias = new float[350][2];
 		float[][] distancias_mais_proximas = new float[k][2];
 		float menor_distancia;
 		
